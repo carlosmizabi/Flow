@@ -1,128 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Reactive</title>
-    <script src="node_modules/rx/dist/rx.all.js"></script>
-    <script src="flow.js"></script>
-    <script src="actions.js"></script>
-    <script src="streams.js"></script>
-    <script src="actor.js"></script>
-    <script src="watchers.js"></script>
-    <script type="text/javascript">
-
-        var Actor   = Flow.Actors.Actor;
-        var Action  = Flow.Actions.Action;
-        var Stream  = Flow.Streams.Stream;
-        var Watcher = Flow.Watchers.Watcher;
-
-        var Stage = new Stream();
-        var Stage2 = new Stream();
-
-//        var seer = new Watcher({
-//            next: function( value ) {
-//                console.log("watcher see value", value );
-//            },
-//            error: function( error ) {
-//                console.log("error", error );
-//            },
-//            end: function(){
-//                console.log("ended");
-//            }
-//        });
-
-//        seer.addStream( Stage );
-
-        var action = new Action("my_action");
-        var actor = new Actor({
-            name: 'Tom Hanks',
-            next: function ( data ){
-                console.log( this.name, data );
-            }
-        });
-        console.log( actor );
-//        var actorWatcher = new Flow.Watchers.Watcher({
-//            next: function( value ) {
-//                console.log("Actor Watcher", value );
-//            }
-//        });
-
-//        actor.addStream( Stage );
-
-        actor.addStreams( Stage, Stage2 );
-
-//        Stage.addWatcher( actor );
-//        Stage2.addWatcher( actor );
-
-
-        setTimeout( function(){
-            Stage.dispatch({
-                action: action,
-                data: "Hello"
-            });
-            Stage2.dispatch({
-                action: action,
-                data: "Hello Again"
-            });
-        }, 1000 );
-
-
-
-
-        //
-        //    var emitter = new Emitter();
-        //
-        //    var subscription = emitter.listen('data', function( data ){
-        //        console.log( 'data', data );
-        //    })
-        //
-        //    var sub2 = emitter.listen('coco', function( data ){
-        //        console.log( 'coco', data );
-        //    });
-        //    setInterval( function(){
-        //        emitter.emit('data', 'foo' );
-        //    }, 1000);
-        //    setInterval( function(){
-        //        emitter.emit('coco', 'bar' );
-        //    }, 4000);
-        //
-        //    console.log( emitter );
-
-        //    var bStream = Kefir.fromEvents( button, 'click' );
-        //
-        //    bStream.onValue( function( x ){
-        //        return 1;
-        //    });
-        //
-        //    var counterStream = bStream.scan( function( acc, event ){
-        //        return acc + 1;
-        //    }, 0);
-        //
-        //    function spacer( size ){
-        //        console.log( size );
-        //        var st = '';
-        //        while( st.length !== size  ){
-        //            st += '-';
-        //        }
-        //        return st;
-        //    }
-        //    var print = function( value ){
-        //        counter.innerHTML = spacer( counter.innerHTML.length ) + value.toString();
-        //    };
-        //
-        //    counterStream.onValue( print.bind(this) );
-        //
-
-
-    </script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mocha Test Runner</title>
+    <link rel="stylesheet" href="../../node_modules/mocha/mocha.css">
 </head>
-<body onload="Flow.start()">
-<h1>Reactive</h1>
-Counter:<div id="counter"></div>
-<br><br>
-<button id="button">Click Me!</button>
-<input>
-<!--<script src="node_modules/kefir/dist/kefir.js"></script>-->
-
+<body>
+<div id="mocha"></div>
+<script src="../../node_modules/mocha/mocha.js"></script>
+<script>mocha.setup('bdd')</script>
+<script src="../../build/client-test.js"></script>
+<script>
+    if (window.mochaPhantomJS) {
+        mochaPhantomJS.run();
+    } else {
+        mocha.run();
+    }
+</script>
 </body>
 </html>
