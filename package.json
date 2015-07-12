@@ -1,0 +1,31 @@
+{
+  "name": "flow",
+  "version": "0.0.1",
+  "description": "The Stream Flow Architecture framework",
+  "main": "flow.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tautalos",
+  "license": "MIT",
+  "dependencies": {
+    "kefir": "^2.7.0",
+    "rx": "^2.5.3"
+  },
+  "devDependencies": {},
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://tautalos@bitbucket.org/tautalos/flow.git"
+  },
+  "keywords": [
+    "javascript",
+    "function",
+    "reactive",
+    "programming",
+    "framework"
+  ],
+  "homepage": "https://bitbucket.org/tautalos/flow#readme"
+}
