@@ -1,7 +1,8 @@
 var Flow = {
-    Stages  : require('./stages'),
-    Actions : require('./actions'),
-    Actors  : require('./actors'),
+    Stages  : require('./stages/stages'),
+    Signals : require('./signals/signals'),
+    Actions : require('./actions/actions'),
+    Actors  : require('./actors/actors'),
     Streams : require('./streams'),
     Watchers: require('./watchers'),
     Utils   : require('./utils'),

@@ -1,4 +1,4 @@
-var Rx = require('./lib.imports').Rx;
+var Rx = require('../lib.imports').Rx;
 
 var Actors, Actor, PRIVATE, PROTO, INIT;
 

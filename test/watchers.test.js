@@ -3,12 +3,8 @@ var expect      = require('chai').expect;
 var Watchers    = require('../src/watchers.js');
 var Rx          = require('../src/lib.imports').Rx;
 
-describe( 'Watchers ::', function(){
-    describe('PREREQUISITES :: ', function(){
-        it('Rx extensions should available', function (){
-            should.exist( Rx );
-        });
-    });
+describe( 'Watchers =>', function(){
+
     describe('DEFINITION ::', function(){
         it('Watchers should be defined', function(){
             should.exist( Watchers );

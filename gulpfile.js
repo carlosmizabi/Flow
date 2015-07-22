@@ -19,7 +19,7 @@ function handleError( err ){
 gulp.task('mocha', function(){
     gulp.src( tests_path )
         .pipe(mocha({
-            reporter: 'list'
+            reporter: ''
         }))
         .on('error', handleError)
 });
@@ -50,7 +50,8 @@ gulp.task('test-build', function(){
 
 gulp.task( 'watch', function(){
     gulp.watch(['./src/**/*.js', './test/**/*.js'], ['test']);
-})
+});
 
 gulp.task( 'test', [ 'mocha' ] );
+gulp.task( 'test-watch', ['test', 'watch']);
 gulp.task( 'default', [ 'build', 'mocha'  ] );

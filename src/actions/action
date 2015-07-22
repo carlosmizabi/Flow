@@ -1,0 +1,34 @@
+var _   =  require('../lib.imports').lodash;
+
+function Action( typeName ){
+    if( _.isString( typeName ) ){
+        this.type =  this.formatStringForActionType( typeName );
+        Object.freeze( this );
+    }
+    else{
+        throw this.ERRORS.ACTION_INVALID_CONTRUCTOR_PARAMETERS;
+    }
+};
+Action.prototype = _.create({
+
+    constructor: Action,
+
+    type: null,
+    ERRORS: {
+        ACTION_INVALID_CONTRUCTOR_PARAMETERS: new Error('Action: tried to construct an Action with invalid parameters')
+    },
+    getActionType: function (){
+        return this.type;
+    },
+    formatStringForActionType: function ( string ){
+        return _.snakeCase( string.toLowerCase() ).trim().toUpperCase();
+    },
+    toString: function (){
+        return 'Action { type: "' + this.type + '" }';
+    },
+    asJSON: function (){
+        return JSON.stringify( this );
+    }
+});
+
+module.exports = Action;
