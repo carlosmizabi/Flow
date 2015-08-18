@@ -45,6 +45,5 @@ Emitter.prototype.dispose = function() {
             subjects[prop].dispose();
         }
     }
-
     this.subjects = {};
 };

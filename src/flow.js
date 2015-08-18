@@ -4,9 +4,9 @@ var Flow = {
     Actions : require('./actions/actions'),
     Actors  : require('./actors/actors'),
     Streams : require('./streams'),
-    Watchers: require('./watchers'),
-    Utils   : require('./utils'),
-}
+    Watchers: require('./watchers/watchers'),
+    Utils   : require('./utils/utils')
+};
 
 module.exports = Flow;
 

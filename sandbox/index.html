@@ -3,170 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Reactive</title>
-    <script src="../dist/flow.js"></script>
-    <script src="libs/lodash.min.3.10.0.js"></script>
-    <script src="libs/immutable.3.7.4.js"></script>
+    <script src="../node_modules/rx/dist/rx.all.js"></script>
+    <!--<script src="../dist/flow.js"></script>-->
+    <!--<script src="libs/lodash.min.3.10.0.js"></script>-->
+    <!--<script src="libs/immutable.3.7.4.js"></script>-->
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.0/lodash.js" type="text/javascript"></script>-->
     <script type="text/javascript">
-        console.log( window );
-/*
-        var Actor   = Flow.Actors.Actor;
-        var Action  = Flow.Actions.Action;
-        var Stream  = Flow.Streams.Stream;
-        var Watcher = Flow.Watchers.Watcher;
-//
-        var Stage = new Stream();
-        var Stage2 = new Stream();
-//nn
-////        var seer = new Watcher({
-////            next: function( value ) {
-////                console.log("watcher see value", value );
-////            },
-////            error: function( error ) {
-////                console.log("error", error );
-////            },
-////            end: function(){
-////                console.log("ended");
-////            }
-////        });
-//
-////        seer.addStream( Stage );
-//
-        var action = new Action("my_action");
-        var actor = new Actor({
-            name: 'Tom Hanks',
-            next: function ( data ){
-                console.log( this.name, data );
-            }
-        });
-        console.log( actor );
-////        var actorWatcher = new Flow.Watchers.Watcher({
-////            next: function( value ) {
-////                console.log("Actor Watcher", value );
-////            }
-////        });
-//
-//        actor.addStream( Stage );
-//
-        actor.addStreams( Stage, Stage2 );
-//
-////        Stage.addWatcher( actor );
-////        Stage2.addWatcher( actor );
-//
-//
-        setTimeout( function(){
-            Stage.dispatch({
-                action: action,
-                data: "Hello"
-            });
-            Stage2.dispatch({
-                action: action,
-                data: "Hello Again"
-            });
-        }, 1000 );
 
+        var subject = new Rx.Subject();
+        var watcher = subject.subscribe(
+                function(x){
+                    console.log('onNext', x);
+                },
+                function(){
+                    console.log('onCompleted');
+                },
+                function( error ){
+                    console.log('onError', error );
+                }
+        );
+        var watcher2 = subject.subscribe(
+                function(x){
+                    console.log('onNext', x * 2 );
+                },
+                function(){
+                    console.log('onCompleted');
+                },
+                function( error ){
+                    console.log('onError', error );
+                }
+        );
+        var count = 0;
+        setInterval(function(){
+            count++;
+            subject.onNext(count);
+        }, 2000);
 
-
-
-        //
-        //    var emitter = new Emitter();
-        //
-        //    var subscription = emitter.listen('data', function( data ){
-        //        console.log( 'data', data );
-        //    })
-        //
-        //    var sub2 = emitter.listen('coco', function( data ){
-        //        console.log( 'coco', data );
-        //    });
-        //    setInterval( function(){
-        //        emitter.emit('data', 'foo' );
-        //    }, 1000);
-        //    setInterval( function(){
-        //        emitter.emit('coco', 'bar' );
-        //    }, 4000);
-        //
-        //    console.log( emitter );
-
-        //    var bStream = Kefir.fromEvents( button, 'click' );
-        //
-        //    bStream.onValue( function( x ){
-        //        return 1;
-        //    });
-        //
-        //    var counterStream = bStream.scan( function( acc, event ){
-        //        return acc + 1;
-        //    }, 0);
-        //
-        //    function spacer( size ){
-        //        console.log( size );
-        //        var st = '';
-        //        while( st.length !== size  ){
-        //            st += '-';
-        //        }
-        //        return st;
-        //    }
-        //    var print = function( value ){
-        //        counter.innerHTML = spacer( counter.innerHTML.length ) + value.toString();
-        //    };
-        //
-        //    counterStream.onValue( print.bind(this) );
-        //
-
-        /*
-            When a watcher registers with the stage the stage returns
-            a function
-         */
-
-//        Action <>-- ActionType
-//               <>--
-//
-//        ActionChanel
-
-//        var stage = {
-//            register: function( registered ){
-//                return function (actionType) {
-//                        var emitter = stage.emitter;
-//                        var sender = registered;
-//                        emitter.emit(actionType, sender);
-//                    }
-//            },
-//            attachEmitterTo: function( registered ){
-//                registered.emit =  this.register( registered );
-//                return registered;
-//            },
-//            emitter: {
-//                emit: function( actionType, sender ){
-//                    console.log('emitting', actionType, sender);
-//                }
-//            }
-//        };
-
-        var echo = function() {
-            return console.log.apply(console, arguments);
-        };
-
-var array = _([1,2,3,4,5]);
-
-        var out = _(array).push(3);
-out = out.value();
-
-var users = [
-    { 'user': 'barney',  'age': 36, 'active': true },
-    { 'user': 'fred',    'age': 40, 'active': false },
-    { 'user': 'pebbles', 'age': 1,  'active': true }
-];
-( users[0].age === 37 ) ? echo('fart') : echo('poop');
-echo( out );
 
     </script>
-</head>
-<body>
-<h1>Reactive</h1>
-Counter:<div id="counter"></div>
-<br><br>
-<button id="button">Click Me!</button>
-<input>
-<!--<script src="node_modules/kefir/dist/kefir.js"></script>-->
 
 </body>
 </html>

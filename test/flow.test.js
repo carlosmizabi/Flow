@@ -19,9 +19,6 @@ describe('Flow =>', function(){
     });
 
     describe('[1] Modules ::', function() {
-        it('Flow should be defined', function () {
-            should.exist(Flow.Stages);
-        });
         it('Flow.Stages should be defined', function () {
             should.exist(Flow.Stages);
         });

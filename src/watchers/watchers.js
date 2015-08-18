@@ -1,5 +1,5 @@
-var Rx = require('./lib.imports').Rx;
-
+var Rx          = require('../lib.imports').Rx;
+var Receptor    = require('./receptor');
 var Watchers;
 
 function Watcher( _initials_ ){
@@ -17,7 +17,8 @@ Watcher.prototype.addStream = function( stream ){
 }
 
 Watchers = {
-    Watcher: Watcher
+    Watcher: Watcher,
+    Receptor: Receptor
 };
 
 Object.freeze( Watchers );

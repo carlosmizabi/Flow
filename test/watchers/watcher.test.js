@@ -27,6 +27,9 @@ describe('Action =>', function(){
         });
         describe('@property type: String', function() {
             var actionName = 'Action_TYPE';
+            it('=> should be defined', function(){
+                new Action( actionName ).should.have.property('type');
+            });
             it('=> should be of @type {String}', function(){
                 //console.log( new Action().type );
                 new Action( actionName ).type.should.be.a( 'string' );
@@ -41,21 +44,12 @@ describe('Action =>', function(){
                 action.type = '';
                 action.type.should.equal( actionName );
             });
-        });
-        describe('@property EmptyAction: Action', function() {
-            it('=> should exist and be an instance of an Action representing a useless action', function(){
-                new Action('ACTION').should.have.property('EmptyAction').which.is.instanceof( Action );
-            });
-        });
-        describe('@method isEmptyAction: Boolean', function(){
-            it('=> should return false if it is not the EmptyAction', function(){
-                new Action('ACTION').isEmptyAction().should.be.false;
-            });
-            it('=> should return true if it is the EmptyAction', function(){
-                Action.prototype.EmptyAction.isEmptyAction().should.be.true;
-            });
+
         });
         describe('@method getActionType(): String', function(){
+            it('=> should exist and be a function', function(){
+                new Action('ACTION').should.have.property('getActionType').which.is.instanceof( Function );
+            });
             it('=> should @return {String} with which it was constructed', function(){
                 var actionName = 'ACTION_TEXT';
                 new Action(actionName).getActionType().should.equal( actionName );
@@ -63,11 +57,14 @@ describe('Action =>', function(){
         });
 
         describe('@method toString(): String', function() {
-            it('=> should return a string', function () {
+            it('=> should exist and be a function', function () {
                 new Action("ACTION_TYPE").toString().should.equal('Action { type: "ACTION_TYPE" }');
             });
         });
         describe('@method asJSON(): String', function() {
+            it('=> should exist and be a function', function(){
+                new Action('ACTION').should.have.property('asJSON').which.is.instanceof( Function );
+            });
             it('=> should return a JSON stringified version of the Action', function () {
                 var expected = new Action("ACTION_TYPE").asJSON();
                 expected.should.be.equal('{"type":"ACTION_TYPE"}');
