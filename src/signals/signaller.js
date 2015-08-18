@@ -19,7 +19,16 @@ var Signaller = function( owner, stage ){
                 Object.freeze( Signaller );
             }
         }
-    }
+    };
+
+    Signaller.emitSignals =  function( spreadOfSignals ){
+        var signals = _.isArray( spreadOfSignals ) ? spreadOfSignals : arguments;
+        if( Signaller.isFinalized() ){
+            _.forEach( signals, function( signal ){
+                Signaller.emitSignal( signal );
+            });
+        }
+    };
     _init();
 };
 

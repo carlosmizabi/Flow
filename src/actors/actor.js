@@ -1,103 +1,80 @@
 var Rx          = require('../lib.imports').Rx;
 var _           = require('../lib.imports').lodash;
+var Immutable   = require('../lib.imports' ).Immutable;
 var Receptor    = require('../watchers/receptor');
+var Action      = require('../actions/action');
 
 var Actor, Private;
 
-Actor = function( name, receptor, stage ){
+Actor = function( name, stage, actions ){
     Rx.Subject.call( this );
     var Actor = this;
     var _private = {};
-    var ARGUMENTS = arguments;
 
+    Actor.name      = '';
     Actor.finalized = false;
+    Actor.stage     = null;
+    Actor.actions   = null;
 
-    Actor.addStageStream = function ( stageStream ){
-        if( stageStream instanceof Stage ){
-            // TODO
-        }
-    };
-    Actor.addStream = function ( stream ) {
-        if( stream instanceof Stream === false ){ return; }
-        if( _private.stream === null ){
-            _private.stream = stream;
-            _private.subscription = _private.stream.subscribe( Actor );
-        }
-        else{
-            _private.stream = _private.stream.merge( stream );
-            _private.subscription.dispose();
-            _private.subscription = _private.stream.subscribe( Actor );
-        }
-    };
-
-    Actor.addStreams = function ( stream ){
-        if( arguments.length > 0 ){
-            for( arg in arguments ){
-                Actor.addStream( arguments[arg] );
-            }
-        }
-    };
-
-    Actor.finalize = function( stage ){
-        if( _.isObject( stage ) && 'addActorAction' in stage ){
-            Actor.stage = stage;
-            Actor.finalized = true;
-            Object.freeze( Actor );
-        }
-    };
-
-    _private.stream = null;
-    _private.subscription = null;
-    _private.constructorArgs = arguments;
     _private.init = function () {
         _private.initName();
-        _private.initReceptor();
         _private.initStage();
+        _private.initActions();
+        _private.registerActions();
+        _private.createSubscription();
     };
     _private.initName = function(){
         Actor.name =  _.isString( name ) ? Private.buildActorName( name ) : Private.anonymousName;
     };
-    _private.initReceptor = function(){
-        if( ARGUMENTS.length === 1 && ARGUMENTS[0] instanceof Receptor ){
-            Actor.name = Private.anonymousName;
-            Actor.receptor = ARGUMENTS[0];
-            _private.setUpReceptorFunctions();
+    _private.initStage = function(){
+        if( _.isObject( stage ) && 'addActorAction' in stage ){
+            Actor.stage = stage;
+        } else {
+            throw Actor.ERRORS.ACTOR_CANNOT_BE_INSTANTIATED_WITHOUT_A_VALID_STAGE;
         }
-        else if( ARGUMENTS.length >= 2 && ARGUMENTS[1] instanceof Receptor ){
-            Actor.receptor = ARGUMENTS[1];
-            _private.setUpReceptorFunctions();
+    };
+    _private.initActions = function (){
+        if( _.isArray( actions )){
+            _.forEach( actions, function( action ){
+                if( action instanceof Action === false ){
+                    throw Actor.ERRORS.ACTOR_CANNOT_BE_INSTANTIATED_WITH_A_COLLECTION_WITH_NON_ACTIONS;
+                }
+            });
+            Actor.actions = actions;
+        } else {
+            throw Actor.ERRORS.INCORRECT_CONSTRUCTOR_PARAMETER_AN_ARRAY_OF_ACTION_IS_REQUIRED;
         }
-        else{
-            throw Actor.ERRORS.ACTOR_INSTANTIATION_REQUIRES_A_RECEPTOR;
-        }
+    };
+    _private.registerActions = function (){
+        _.forEach( Actor.actions, function( action ){
+            if( stage.hasAction( action ) === false ){
+                stage.addActorAction( Actor, action );
+            } else {
+                Actor.ERRORS.ACTOR_CANNOT_BE_INSTANTIATED_WITH_ACTION_ALREADY_ON_STAGE;
+            }
+        });
+    };
+    _private.createSubscription = function (){
+
     };
 
-    _private.initStage = function (){
-        if( ARGUMENTS.length === 2 && ARGUMENTS[0] instanceof Receptor ){
-            Actor.finalize( ARGUMENTS[1] );
-        }
-        else if( ARGUMENTS.length === 3 && ARGUMENTS[1] instanceof Receptor ){
-            Actor.finalize( ARGUMENTS[2] );
-        }
-    };
-
-    _private.setUpReceptorFunctions = function (){
-        Actor.onSignal      = Actor.receptor.onSignal;
-        Actor.onNext        = Actor.onSignal;
-        Actor.onEnd         = Actor.receptor.onEnd;
-        Actor.onComplete    = Actor.onEnd;
-        Actor.onError       = Actor.onError;
-    };
     _private.init();
 };
 
 Actor.prototype = _.create( Rx.Subject.prototype, {
     constructor: Actor,
+    ACTOR_POSTFIX: '_ACTOR',
+    ANOMYMOUS_ACTOR_NAME: 'ANONYMOUS' + '_ACTOR',
     ERRORS: {
-        ACTOR_INSTANTIATION_REQUIRES_A_RECEPTOR: new Error('Actors needs a receptor at construction')
+        ACTOR_CANNOT_BE_INSTANTIATED_WITHOUT_A_VALID_STAGE:
+            new Error('Actor can not be instantiated without a valid stage'),
+        ACTOR_CANNOT_BE_INSTANTIATED_WITH_ACTION_ALREADY_ON_STAGE:
+            new Error('Actor can not be instantiated with a action already on the stage'),
+        INCORRECT_CONSTRUCTOR_PARAMETER_AN_ARRAY_OF_ACTION_IS_REQUIRED:
+            new Error('Actor needs an Array<Actions> at instantiation'),
+        ACTOR_CANNOT_BE_INSTANTIATED_WITH_A_COLLECTION_WITH_NON_ACTIONS:
+            new Error('Actor cannot instantiated with a mixed collection, in the collection they must all be actions')
     },
-    ACTOR_POSTFIX   : '_ACTOR',
-    ANOMYMOUS_ACTOR_NAME  : 'ANONYMOUS' + '_ACTOR',
     isFinalized: function(){
         return this.finalized || false;
     },
@@ -113,7 +90,12 @@ Private = {
     }
 };
 
-Actor.prototype.EmptyActor = new Actor( 'EMPTY', Receptor.prototype.EmptyReceptor );
+Actor.prototype.EmptyActor = new Actor(
+    'EMPTY',
+    { addActorAction: function(){} },
+    []
+);
+Object.freeze( Actor.prototype.EmptyActor );
 Object.freeze( Actor.prototype );
 
 module.exports = Actor;

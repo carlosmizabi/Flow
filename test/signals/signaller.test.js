@@ -113,16 +113,54 @@ describe( 'Signaller =>', function(){
             });
         });
 
-        describe( '@method emit( action: Action, message: Message): Signal', function(){
-            it( '=> should emit a Signal onto the stage');
-            it( '=> should return the emitted signal' );
-            it( '=> should return the EmptySignal if the action or messsage were not valid' );
-            it( '=> should be noop when needed and the stage is no longer a valid stage' );
-        });
+        describe( '@method emit( action: Action, message: Message ): Signal', function(){
+            var stage;
+            var action;
+            var actor;
+            var owner;
+            var signaller;
+            var message;
+            var signalsContainer;
+            var subscriber;
 
-        describe( '@method emitSimple( action: Action ): SimpleSignal', function(){
-            it( '=> should return the simple signal' );
-            it( '=> should emit on stage a simple signal that only requires and action' );
+            beforeEach(function(){
+                stage = Stages.createStage();
+                action = Actions.createAction( 'SOME_TYPE' );
+                actor = Actors.createActor( 'SOME_NAME' );
+                owner = {};
+                signaller = new Signaller( owner, stage );
+                message = Signals.createMessage({ text: 'this is the body' });
+                signalsContainer = [];
+                subscriber = stage.subscribe(
+                    function( signal ){
+                        // onNext
+                        signalsContainer.push( signal );
+                    },
+                    function(){}, // onComplete
+                    function(){} // onError
+                );
+            });
+            afterEach( function(){
+                stage = action = actor = owner = signaller = message = signalsContainer = subscriber = undefined;
+            });
+            it( '=> should emit a Signal onto the stage', function(){
+                stage.addActorAction( actor, action );
+                signaller.emit();
+                expect( signalsContainer.length ).to.equal( 0 );
+                signaller.emit( action, message );
+                expect( signalsContainer.length ).to.equal( 1 );
+                signaller.emit( action, message );
+                expect( signalsContainer.length ).to.equal( 2 );
+            });
+            it( '=> should return the emitted signal', function(){
+                stage.addActorAction( actor, action );
+                var signal = signaller.emit( action, message );
+                expect( signal ).to.be.instanceof( Signals.Signal );
+            });
+            it( '=> should return the EmptySignal if the action or messsage were not valid', function(){
+                var signal = signaller.emit();
+                expect( signal.isEmptySignal() ).to.be.true;
+            });
         });
 
         describe( '@method emitSignal( signal: Signal ): Void', function(){
@@ -153,8 +191,60 @@ describe( 'Signaller =>', function(){
         });
 
         describe( '@method emitSignals( ...signal: Signal ): Void', function(){
-            it( '=> should emit onto the stage the spread of signals' );
-            it( '=> should emit onto the stage the array of signals' );
+            it( '=> should emit onto the stage the spread of signals', function(){
+                var stage = Stages.createStage();
+                var action = Actions.createAction( 'SOME_TYPE' );
+                var actor = Actors.createActor( 'SOME_NAME' );
+                var owner = {};
+                var signaller = new Signaller( owner, stage );
+                var signal = Signals.createSignal( signaller, action );
+                var signalsContainer = [];
+                var subscriber = stage.subscribe(
+                    function( signal ){
+                        // onNext
+                        signalsContainer.push( signal );
+                    },
+                    function(){}, // onComplete
+                    function(){} // onError
+                )
+                stage.addActorAction( actor, action );
+                signaller.emitSignals( signal );
+                expect( signalsContainer.length ).to.equal( 1 );
+                signaller.emitSignals( signal, signal, signal );
+                expect( signalsContainer.length ).to.equal( 4 );
+                signaller.emitSignals( signal, signal, signal, signal, signal, signal );
+                expect( signalsContainer.length ).to.equal( 10 );
+                signalsContainer.forEach( function( _signal ){
+                    expect( _signal ).to.equal( signal );
+                }, this);
+            });
+            it( '=> should emit onto the stage the array of signals' , function(){
+                var stage = Stages.createStage();
+                var action = Actions.createAction( 'SOME_TYPE' );
+                var actor = Actors.createActor( 'SOME_NAME' );
+                var owner = {};
+                var signaller = new Signaller( owner, stage );
+                var signal = Signals.createSignal( signaller, action );
+                var signalsContainer = [];
+                var subscriber = stage.subscribe(
+                    function( signal ){
+                        // onNext
+                        signalsContainer.push( signal );
+                    },
+                    function(){}, // onComplete
+                    function(){} // onError
+                )
+                stage.addActorAction( actor, action );
+                signaller.emitSignals([ signal ]);
+                expect( signalsContainer.length ).to.equal( 1 );
+                signaller.emitSignals([ signal, signal ]);
+                expect( signalsContainer.length ).to.equal( 3 );
+                signaller.emitSignals([ signal, signal, signal, signal, signal, signal ]);
+                expect( signalsContainer.length ).to.equal( 9 );
+                signalsContainer.forEach( function( _signal ){
+                    expect( _signal ).to.equal( signal );
+                }, this);
+            });
         });
 
         describe( '@method isEmptySignaller(): Boolean', function(){

@@ -124,8 +124,6 @@ var Stage = function(){
     Stage.finalize = function( object ){
         if( object instanceof Signals.Signaller ){
             Private.finalizeSignaller( Stage, object );
-        } else if ( object instanceof Actors.Actor ){
-            Private.finalizeActor( Stage, object );
         }
     };
 
@@ -165,11 +163,11 @@ Private.createInTheSignallerAn_Emit_Function = function ( Stage, signaller ){
 
 Private.createEmitFunction = function( Stage, signaller ){
     return function( action, message ){
-        if( action instanceof Action  ){
-            var signal = Signals.createSignal( signaller, action, message );
-            if( signal.isEmptySignal() === false )
-                Stage.emit( signal );
+        var signal = Signals.createSignal( signaller, action, message );
+        if( signal.isEmptySignal() === false ){
+            Stage.emit( signal );
         }
+        return signal;
     }
 };
 
@@ -218,10 +216,6 @@ Private.extractActorsWithNamesInRegistry = function ( Stage, actorNamesCollectio
 
 Private.finalizeSignaller = function ( Stage, signaller ){
     signaller.finalize( Stage );
-}
-
-Private.finalizeActor = function ( Stage, actor ){
-    actor.finalize( Stage );
 }
 
 Object.freeze( Stage );

@@ -1,10 +1,12 @@
-var should  = require('chai').should();
-var expect  = require('chai').expect;
-var Rx      = require('../../src/lib.imports').Rx;
-var Flow    = require('../../src/flow');
-var Stages  = Flow.Stages;
-var Actors  = Flow.Actors;
-var Actor   = Actors.Actor;
+var should      = require('chai').should();
+var expect      = require('chai').expect;
+var Rx          = require('../../src/lib.imports').Rx;
+var Immutable   = require('../../src/lib.imports').Immutable;
+var Flow        = require('../../src/flow');
+var Stages      = Flow.Stages;
+var Actors      = Flow.Actors;
+var Actor       = Actors.Actor;
+var Actions     = Flow.Actions;
 var Receptor    = Flow.Watchers.Receptor;
 
 describe('Actor =>', function(){
@@ -21,30 +23,35 @@ describe('Actor =>', function(){
                 Actor.should.be.instanceof(Function);
             });
             it('@extends Rx.Subject ', function () {
-                var actor = new Actor('ACTOR', new Receptor());
+                var actor = new Actor('ACTOR', Stages.createStage(), []);
                 actor.should.be.instanceof(Rx.Subject);
             });
         });
-        describe('@constructor( name: String, receptor: Receptor, stage: Stage ): Void', function () {
-            it('=> should throw and error if a receptor is not provided', function () {
-                Actor.should.throw();
-                (function () {
-                    new Actor(null);
-                }).should.throw(Actor.prototype.ERRORS.ACTOR_INSTANTIATION_REQUIRES_A_RECEPTOR);
+        describe('@constructor( name: String, stage: Stage, actions: Immutable.Set<Action> ): Void', function () {
+            it('=> should throw and error if a valid Stage is not provided', function(){
+                expect(function(){
+                    new Actor( 'name', null, null );
+                }).to.throw(Actor.prototype.ERRORS.ACTOR_CANNOT_BE_INSTANTIATED_WITHOUT_A_VALID_STAGE);
+            });
+            it('=> should throw and error the action is not the correct type', function(){
+                expect(function(){
+                    new Actor( 'name', Stages.createStage(), null );
+                }).to.throw(Actor.prototype.ERRORS.INCORRECT_CONSTRUCTOR_PARAMETER_AN_ARRAY_OF_ACTION_IS_REQUIRED);
+            });
+            it('=> should throw and error if any of the actions are invalid', function(){
+                var actionsSet = [ new Actions.Action('FIRST'), null ];
+                expect(function(){
+                   new Actor( 'name', Stages.createStage(), actionsSet );
+                }).to.throw(Actor.prototype.ERRORS.ACTOR_CANNOT_BE_INSTANTIATED_WITH_A_COLLECTION_WITH_NON_ACTIONS);
             });
             it('=> should create an Actor even if the name is completely ommitted', function(){
-                new Actor( new Receptor() ).should.exist;
+                //new Actor( new Receptor() ).should.exist;
             });
             it('=> should throw and error if a receptor is not provided');
             it('=> should not be finalized if a stage is not provided', function(){
-                var actor = new Actor( new Receptor );
+                //var actor = new Actor( new Receptor );
             });
             it('=> should not be frozen if a stage is not provided');
-        });
-        describe('@property receptor: Receptor', function () {
-            it('=> should be defined', function(){
-                new Actor( null, new Receptor() ).should.have.property('receptor');
-            });
         });
 
         describe( '@property EmptyActor: Actor', function(){
@@ -53,63 +60,6 @@ describe('Actor =>', function(){
             });
         });
 
-        describe('@method isFinalized(): Boolean', function(){
-            it('=> should return if the Actor has been finalized', function(){
-                var actor = new Actor( 'FART', Receptor.prototype.EmptyReceptor, Stages.createStage() );
-                expect( actor.isFinalized() ).to.be.true;
-            });
-        });
-
-        describe( '@method finalize( stage: Stage ): Void', function(){
-            it( '=> should not finalize the Actor if not provided with a valid stage', function(){
-                var actor = new Actor( '', Receptor.prototype.EmptyReceptor );
-                actor.finalize();
-                expect( actor.isFinalized() ).to.be.false;
-                actor.finalize( {} );
-                expect( actor.isFinalized() ).to.be.false;
-                actor.finalize( null );
-                expect( actor.isFinalized() ).to.be.false;
-            });
-            it( '=> should finalize the Actor if provided with a valid stage', function(){
-                var actor = new Actor( '', Receptor.prototype.EmptyReceptor );
-                var stage = Stages.createStage();
-                actor.finalize( stage );
-            });
-        });
-
-        describe('@method onSignal(): Void', function () {
-            it('=> should be defined', function(){
-                var actor = new Actor( null, new Receptor() );
-                actor.should.have.property('onSignal').which.equals( actor.onNext );
-            });
-        });
-        describe('@method onNext(): Void', function () {
-            it('=> should be defined', function(){
-                var actor = new Actor( null, new Receptor() );
-                actor.should.have.property('onNext').which.equals( actor.onComplete );
-            });
-        });
-        describe('@method onError(): Void', function () {
-            it('=> should be defined', function(){
-                var actor = new Actor( null, new Receptor() );
-                actor.should.have.property('onError');
-            });
-        });
-        describe('@method onEnd(): Void', function () {
-            it('=> should be defined', function(){
-                var actor = new Actor( null, new Receptor() );
-                actor.should.have.property('onEnd').which.equals( actor.onComplete );
-            });
-        });
-        describe('@method onComplete(): Void', function () {
-            it('=> should be defined', function(){
-                var actor = new Actor( null, new Receptor() );
-                actor.should.have.property('onComplete').which.equals( actor.onEnd );
-            });
-        });
-        describe('@method addStage( Stage ): Actor', function(){
-            it('should add ');
-        });
         describe('@method addAction( action: Action ): Void', function(){
             it('=> should add an action to its watched actions')
             it('=> should create an action stream that can be subscribed for that action');

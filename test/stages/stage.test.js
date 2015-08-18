@@ -44,14 +44,14 @@ describe('Stage =>', function(){
         describe('@method addActorAction( actor: Actor, action: Action ): Boolean', function(){
             it('=> should add an actor-action registry entry to the stage', function(){
                 var stage = new Stage();
-                var actor = Actors.createActor('Tom_Hanks', new Receptor());
+                var actor = Actors.createActor('Tom_Hanks', stage, []);
                 var action = Actions.createAction('Smile');
                 stage.addActorAction( actor, action );
                 stage.getActionRegistry().size.should.equal( 1 );
             });
             it('=> should not add an actor-action for an action already registered', function(){
                 var stage = new Stage();
-                var actor = Actors.createActor('Tom_Hanks', new Receptor());
+                var actor = Actors.createActor('Tom_Hanks', stage, []);
                 var action = Actions.createAction('Smile');
                 stage.addActorAction( actor, action );
                 stage.addActorAction( actor, action );
@@ -80,27 +80,24 @@ describe('Stage =>', function(){
         describe('@method getActorNamed( name: String ): Actor', function(){
             it('=> should return an actor from string name if on stage', function(){
                 var stage = new Stage();
-                var actor = Actors.createActor('Tom_Hanks', new Receptor());
-                var action = Actions.createAction('Smile');
-                stage.addActorAction( actor, action );
-                expect( stage.getActorNamed( 'TOM_HANKS_ACTOR' ) === actor ).to.equal( true );
+                var action = Actions.createAction( 'ACTION' );
+                var actor = Actors.createActor('Tom_Hanks', stage, [ action ]);
+                var extractedActor = stage.getActorNamed( 'TOM_HANKS_ACTOR' );
+                expect( extractedActor.isEmptyActor()  ).to.be.false;
+                expect( extractedActor === actor ).to.be.true;
             });
             it('=> should return the empty actor if actor with name string is not found on stage', function(){
                 var stage = new Stage();
-                var actor = Actors.createActor('Tom_Hanks', new Receptor());
-                var action = Actions.createAction('Smile');
-                stage.addActorAction( actor, action );
-                expect( stage.getActorNamed( 'NO_ACTOR' ) === Actors.EmptyActor ).to.equal( true );
+                expect( stage.getActorNamed( 'NO_ACTOR' ).isEmptyActor() ).to.be.true;
             });
         });
         describe('@method getActorForAction( action: Action ): Actor', function(){
             var stage, actor, addedAction, notAddedAction;
             beforeEach( function(){
                 stage           = new Stage();
-                actor           = Actors.createActor('Tom_Hanks', new Receptor());
                 addedAction     = Actions.createAction('Smile');
                 notAddedAction  = Actions.createAction('Cry');
-                stage.addActorAction( actor, addedAction );
+                actor           = Actors.createActor('Tom_Hanks', stage, [addedAction]);
             });
             afterEach( function(){
                 stage = actor = addedAction = notAddedAction = null;
@@ -199,15 +196,12 @@ describe('Stage =>', function(){
         describe('@method hasActorNamed( name: String ): Boolean', function(){
             it('=> should take a string and return true if the actor is registered on the stage', function(){
                 var stage = new Stage();
-                var actor1 = Actors.createActor('Tom_Hanks', new Receptor());
-                var actor2 = Actors.createActor('Angelina_Jolie', new Receptor());
-                var actor3 = Actors.createActor('Emily_Blunt', new Receptor());
                 var actor1Action = Actions.createAction('Smile');
                 var actor2Action = Actions.createAction('Kill');
                 var actor3Action = Actions.createAction('Dance');
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
+                var actor1 = Actors.createActor('Tom_Hanks', stage, [ actor1Action ]);
+                var actor2 = Actors.createActor('Angelina_Jolie', stage, [ actor2Action ]);
+                var actor3 = Actors.createActor('Emily_Blunt', stage, [ actor3Action ]);
                 expect( stage.hasActorNamed( 'TOM_HANKS_ACTOR' ) ).to.be.true;
                 expect( stage.hasActorNamed( 'ANGELINA_JOLIE_ACTOR' ) ).to.be.true;
                 expect( stage.hasActorNamed( 'EMILY_BLUNT_ACTOR' ) ).to.be.true;
@@ -316,72 +310,47 @@ describe('Stage =>', function(){
             var typeAction1, typeAction2, typeAction3;
             var actor1Action, actor2Action, actor3Action;
             var notAddedAction;
+            var stage;
             beforeEach(function(){
                 typeAction1 = 'SMILE';
                 typeAction2 = 'KILL';
                 typeAction3 = 'DANCE';
-                actor1  = Actors.createActor('Tom_Hanks',       new Receptor());
-                actor2  = Actors.createActor('Angelina_Jolie',  new Receptor());
-                actor3  = Actors.createActor('Emily_Blunt',     new Receptor());
                 actor1Action    = Actions.createAction( typeAction1 );
                 actor2Action    = Actions.createAction( typeAction2 );
                 actor3Action    = Actions.createAction( typeAction3 );
+                stage = new Stage();
+                actor1  = Actors.createActor('Tom_Hanks',  stage, [actor1Action] );
+                actor2  = Actors.createActor('Angelina_Jolie',  stage, [actor2Action]);
+                actor3  = Actors.createActor('Emily_Blunt',  stage, [actor3Action]);
                 notAddedAction  = Actions.EmptyAction;
             });
             it('=> should return an array of actions from a spread strings of actions types', function(){
                 var arrayFrom_ArgumentSpread;
-                var arrayFrom_ArgumentArray;
-                var arrayFrom_ArgumentSingle;
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
-
-                // Given a Argument Spread ------------------------------------------------------------
                 arrayFrom_ArgumentSpread = stage.whichActionsExistFromTypes( typeAction1, typeAction2, typeAction3, notAddedAction );
-                expect(_.isArray( arrayFrom_ArgumentSpread ) && arrayFrom_ArgumentSpread.length === 3 ).to.be.true;
+                expect(_.isArray( arrayFrom_ArgumentSpread )).to.be.true;
+                expect( arrayFrom_ArgumentSpread.length ).to.equal( 3 );
             });
             it('=> should return an array of actions from array of actions', function(){
-                var arrayFrom_ArgumentSpread;
                 var arrayFrom_ArgumentArray;
-                var arrayFrom_ArgumentSingle;
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
-
-                // Given an Array  --------------------------------------------------------------------
                 arrayFrom_ArgumentArray = stage.whichActionsExistFromTypes( [typeAction1, typeAction2, notAddedAction] );
-                expect(_.isArray( arrayFrom_ArgumentArray ) && arrayFrom_ArgumentArray.length === 2 ).to.be.true;
+                expect(_.isArray( arrayFrom_ArgumentArray )).to.be.true;
+                expect( arrayFrom_ArgumentArray.length ).to.equal( 2 );
             });
             it('=> should return an array with one action given one type of a valid action on stage', function(){
-                var arrayFrom_ArgumentSpread;
-                var arrayFrom_ArgumentArray;
                 var arrayFrom_ArgumentSingle;
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
 
                 // Given a single action --------------------------------------------------------------
                 arrayFrom_ArgumentSingle = stage.whichActionsExistFromTypes( typeAction1 );
-                expect(_.isArray( arrayFrom_ArgumentSingle ) && arrayFrom_ArgumentSingle.length === 1 ).to.be.true;
+                expect(_.isArray( arrayFrom_ArgumentSingle ) ).to.be.true;
+                expect( arrayFrom_ArgumentSingle.length ).to.equal( 1 );
             });
             it('=> should return an array of actions which are registered in the stage only', function(){
                 var arrayOfActionsInStage;
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
                 arrayOfActionsInStage = stage.whichActionsExist( actor1Action, actor2Action, actor3Action, notAddedAction );
                 expect( arrayOfActionsInStage.length ).to.equal( 3 );
                 expect(_.includes( arrayOfActionsInStage, actor1Action, actor2Action, actor3Action )).to.be.true;
             });
             it('=> should return an empty array if not provided with valid actions or nothing', function(){
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
 
                 returnArray = stage.whichActionsExist();
                 expect( _.isArray( returnArray ) && returnArray.length === 0  ).to.be.true;
@@ -404,23 +373,21 @@ describe('Stage =>', function(){
             var actor2Action;
             var actor3Action;
             var notAddedActor;
+            var stage;
             beforeEach(function(){
-                actor1  = Actors.createActor('Tom_Hanks', new Receptor());
-                actor2  = Actors.createActor('Angelina_Jolie', new Receptor());
-                actor3  = Actors.createActor('Emily_Blunt', new Receptor());
                 actor1Action    = Actions.createAction('Smile');
                 actor2Action    = Actions.createAction('Kill');
                 actor3Action    = Actions.createAction('Dance');
                 notAddedActor  = Actors.EmptyActor;
+                stage = new Stage();
+                actor1  = Actors.createActor('Tom_Hanks',  stage, [actor1Action] );
+                actor2  = Actors.createActor('Angelina_Jolie',  stage, [actor2Action]);
+                actor3  = Actors.createActor('Emily_Blunt',  stage, [actor3Action]);
             });
             it('=> should return an array of actions from a spread or array of actions', function(){
                 var arrayFrom_ArgumentSpread;
                 var arrayFrom_ArgumentArray;
                 var arrayFrom_ArgumentSingle;
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
 
                 // Given a Argument Spread ------------------------------------------------------------
                 arrayFrom_ArgumentSpread = stage.whichActorsExist( actor1, actor2, actor3, notAddedActor );
@@ -430,10 +397,6 @@ describe('Stage =>', function(){
                 var arrayFrom_ArgumentSpread;
                 var arrayFrom_ArgumentArray;
                 var arrayFrom_ArgumentSingle;
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
 
                 // Given an Array  --------------------------------------------------------------------
                 arrayFrom_ArgumentArray = stage.whichActorsExist( [actor1, actor2, notAddedActor] );
@@ -444,10 +407,6 @@ describe('Stage =>', function(){
                 var arrayFrom_ArgumentSpread;
                 var arrayFrom_ArgumentArray;
                 var arrayFrom_ArgumentSingle;
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
 
                 // Given a single action --------------------------------------------------------------
                 arrayFrom_ArgumentSingle = stage.whichActorsExist( actor1 );
@@ -455,19 +414,12 @@ describe('Stage =>', function(){
             });
             it('=> should return an array of actions which are registered in the stage only', function(){
                 var arrayOfActionsInStage;
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
+
                 arrayOfActionsInStage = stage.whichActorsExist( actor1, actor2, actor3, notAddedActor );
                 expect( arrayOfActionsInStage.length ).to.equal( 3 );
                 expect(_.includes( arrayOfActionsInStage, actor1, actor2, actor3 )).to.be.true;
             });
             it('=> should return an empty array if not provided with valid actions or nothing', function(){
-                var stage = new Stage();
-                stage.addActorAction( actor1, actor1Action );
-                stage.addActorAction( actor2, actor2Action );
-                stage.addActorAction( actor3, actor3Action );
 
                 returnArray = stage.whichActorsExist();
                 expect( _.isArray( returnArray ) && returnArray.length === 0  ).to.be.true;
@@ -580,15 +532,6 @@ describe('Stage =>', function(){
                 var signaller = Signals.createSignaller( owner );
                 stage.finalize( signaller );
                 expect( signaller.isFinalized() ).to.be.true;
-            });
-        });
-
-        describe( '@method finalize( actor: Actor ): Void ', function(){
-            it( '=> should take a actor and finalize it', function(){
-                var stage = Stages.createStage();
-                var actor = Actors.createActor( 'Tom_Hanks', new Receptor() );
-                stage.finalize( actor );
-                expect( actor.isFinalized() ).to.be.true;
             });
         });
 

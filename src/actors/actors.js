@@ -3,10 +3,10 @@ var Receptor    = require('../watchers/receptor');
 var _           = require('../lib.imports').lodash;
 var Actors = {
     Actor: Actor,
-    EmptyActor: new Actor("EMPTY", new Receptor() ),
-    createActor: function( name, receptor ){
-        if( receptor instanceof Receptor ){
-            return new Actor( name , receptor );
+    EmptyActor: Actor.prototype.EmptyActor,
+    createActor: function( name, stage, actions ){
+        if( _.isObject( stage ) && _.isArray( actions ) ){
+            return new Actor( name , stage, actions );
         }
         else {
             return this.EmptyActor;
@@ -21,5 +21,4 @@ var Actors = {
 }
 
 Object.freeze( Actors );
-
 module.exports =  Actors;
