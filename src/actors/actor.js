@@ -10,24 +10,34 @@ Actor = function( name, stage, actions ){
     Rx.Subject.call( this );
     var Actor = this;
     var _private = {};
+    var _arguments = arguments;
 
     Actor.name      = '';
     Actor.finalized = false;
     Actor.stage     = null;
     Actor.actions   = null;
 
+    _private.actionsArray;
+
     _private.init = function () {
+        _private.checkConstructorArguments();
         _private.initName();
         _private.initStage();
         _private.initActions();
         _private.registerActions();
         _private.createSubscription();
+        _private.finalize();
+    };
+    _private.checkConstructorArguments = function (){
+        if( _arguments.length < 3 ){
+            throw Actor.ERRORS.ACTOR_CANNOT_BE_INSTANTIATED_WITHOUT_ALL_REQUIRED_PARAMETERS;
+        }
     };
     _private.initName = function(){
-        Actor.name =  _.isString( name ) ? Private.buildActorName( name ) : Private.anonymousName;
+        Actor.name =  _.isString( name ) && name !== '' ? Private.buildActorName( name ) : Private.anonymousName;
     };
     _private.initStage = function(){
-        if( _.isObject( stage ) && 'addActorAction' in stage ){
+        if( stage instanceof Rx.Subject && 'addActorAction' in stage ){
             Actor.stage = stage;
         } else {
             throw Actor.ERRORS.ACTOR_CANNOT_BE_INSTANTIATED_WITHOUT_A_VALID_STAGE;
@@ -40,13 +50,13 @@ Actor = function( name, stage, actions ){
                     throw Actor.ERRORS.ACTOR_CANNOT_BE_INSTANTIATED_WITH_A_COLLECTION_WITH_NON_ACTIONS;
                 }
             });
-            Actor.actions = actions;
+            Actor.actions = new Immutable.Set( actions );
         } else {
             throw Actor.ERRORS.INCORRECT_CONSTRUCTOR_PARAMETER_AN_ARRAY_OF_ACTION_IS_REQUIRED;
         }
     };
     _private.registerActions = function (){
-        _.forEach( Actor.actions, function( action ){
+        Actor.actions.forEach( function( action ){
             if( stage.hasAction( action ) === false ){
                 stage.addActorAction( Actor, action );
             } else {
@@ -55,7 +65,13 @@ Actor = function( name, stage, actions ){
         });
     };
     _private.createSubscription = function (){
+        Actor.stageObserver = Actor.stage.filter(function( signal ){
+            return  Actor.actions.has( signal.action );
+        }).subscribe( Actor );
+    };
 
+    _private.finalize = function (){
+       Object.freeze( Actor );
     };
 
     _private.init();
@@ -66,6 +82,8 @@ Actor.prototype = _.create( Rx.Subject.prototype, {
     ACTOR_POSTFIX: '_ACTOR',
     ANOMYMOUS_ACTOR_NAME: 'ANONYMOUS' + '_ACTOR',
     ERRORS: {
+        ACTOR_CANNOT_BE_INSTANTIATED_WITHOUT_ALL_REQUIRED_PARAMETERS:
+            new Error('an Actor requires a Name, Stage, and an Actions Collection at construction'),
         ACTOR_CANNOT_BE_INSTANTIATED_WITHOUT_A_VALID_STAGE:
             new Error('Actor can not be instantiated without a valid stage'),
         ACTOR_CANNOT_BE_INSTANTIATED_WITH_ACTION_ALREADY_ON_STAGE:
@@ -89,10 +107,11 @@ Private = {
         return nameString.toUpperCase().replace(/[\s*]/, '_') + Actor.prototype.ACTOR_POSTFIX;
     }
 };
-
+var emptySubject = new Rx.Subject();
+emptySubject.addActorAction = Rx.noop;
 Actor.prototype.EmptyActor = new Actor(
     'EMPTY',
-    { addActorAction: function(){} },
+    emptySubject,
     []
 );
 Object.freeze( Actor.prototype.EmptyActor );

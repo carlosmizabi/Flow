@@ -10,9 +10,7 @@ function Action( typeName ){
     }
 };
 Action.prototype = _.create({
-
     constructor: Action,
-
     type: null,
     ERRORS: {
         ACTION_INVALID_CONTRUCTOR_PARAMETERS: new Error('Action: tried to construct an Action with invalid parameters')

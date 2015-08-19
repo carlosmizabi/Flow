@@ -11,38 +11,74 @@
     <script type="text/javascript">
 
         var subject = new Rx.Subject();
-        var watcher = subject.subscribe(
+        var subject2 = new Rx.Subject(
                 function(x){
-                    console.log('1 onNext', x);
+                    console.log('subject2 onNext', x);
                 },
                 function(){
-                    console.log('1 onCompleted');
+                    console.log('subjec2 onCompleted');
                 },
                 function( error ){
-                    console.log('1 onError', error );
+                    console.log('subject2 onError', error );
                 }
         );
-        var count = 0;
-        setInterval(function(){
+        var watcher = subject.subscribe(
+                function(x){
+                    console.log('watcher onNext', x);
+                },
+                function(){
+                    console.log('watcher onCompleted');
+                },
+                function( error ){
+                    console.log('watcher onError', error );
+                }
+        );
+        subject.multicast( subject2 );
+//       subject.multicast( subject2, function( e ){
+//            console.log('ever');
+//            return e instanceof Date;
+//        });
+
+        setTimeout(function(){
             subject.onNext( new Date() );
         }, 2000);
-        var watcher2;
-        setTimeout( function(){
-            watcher2 = subject.subscribe(
-                    function(x){
-                        console.log('2 onNext', x );
-                    },
-                    function(){
-                        console.log('2 onCompleted');
-                    },
-                    function( error ){
-                        console.log('2 onError', error );
-                    }
-            );
-        }, 6000 )
-        setTimeout( function(){
-            watcher2.dispose();
-        }, 7000 )
+
+//        var watcher = new Rx.Subject(
+//                function(x){
+//                    console.log('1 onNext', x);
+//                },
+//                function(){
+//                    console.log('1 onCompleted');
+//                },
+//                function( error ){
+//                    console.log('1 onError', error );
+//                }
+//        );
+//        var sub = subject.filter(function( e ){
+//            return true;
+//        } ).subscribe( watcher );
+//        console.log( sub, subject );
+////        var count = 0;
+//        setInterval(function(){
+//            subject.onNext( new Date() );
+//        }, 2000);
+//        var watcher2;
+//        setTimeout( function(){
+//            watcher2 = subject.subscribe(
+//                    function(x){
+//                        console.log('2 onNext', x );
+//                    },
+//                    function(){
+//                        console.log('2 onCompleted');
+//                    },
+//                    function( error ){
+//                        console.log('2 onError', error );
+//                    }
+//            );
+//        }, 6000 )
+//        setTimeout( function(){
+//            watcher2.dispose();
+//        }, 7000 )
 
 //
 

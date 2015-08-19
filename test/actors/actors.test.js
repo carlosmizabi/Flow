@@ -6,9 +6,7 @@ var Actors      = Flow.Actors;
 var Receptor    = Flow.Watchers.Receptor;
 
 describe('Actors Module =>', function () {
-    describe('@behaviour',function(){
-        it('should provide a factory for creating Actors safely');
-    });
+
     describe('@unit', function(){
         describe( '@type Object', function(){
             it('=> should exist and be an object', function(){
@@ -33,7 +31,6 @@ describe('Actors Module =>', function () {
             it('=> should return an anonymous actor if no name is provided', function(){
                 var actor = Actors.createActor( null, Stages.createStage(), []);
                 actor.name.should.equal( actor.ANOMYMOUS_ACTOR_NAME );
-
             });
         });
         describe('@method isEmptyActor(): Boolean', function(){

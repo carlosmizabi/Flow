@@ -1,74 +1,78 @@
 var should  = require('chai').should();
+var expect  = require('chai').expect;
+var Rx      = require('../../src/lib.imports').Rx;
 var Flow    = require('../../src/flow.js');
 var Action  = Flow.Actions.Action;
+var Watcher = Flow.Watchers.Watcher;
 
-describe('Action =>', function(){
+describe('Watcher =>', function(){
 
     describe('@behaviour', function(){
-        it('should encapsulate an action type');
+        it( '=> should by default simply return the signals it receives', function (){
+            var signals = [];
+            var subject = new Rx.Subject();
+            var watcher = new Watcher ({
+                onSignal: function( signal ){
+                    signals.push( signal );
+                }
+            });
+            subject.subscribe( watcher );
+            subject.onNext("something");
+            expect( signals.length ).to.equal( 1 );
+        });
     });
 
     describe('@unit', function(){
-        describe('@type', function() {
-            it('=> is defined', function () {
-                Action.should.exist;
+        describe('@type', function(){
+            it('=> should be defined and have the correct type', function(){
+                should.exist( Watcher );
             });
-            it('=> is a function ', function () {
-                Action.should.be.instanceof(Function);
-            });
-        });
-        describe('@constructor ( typeName: String )', function() {
-            it('=> is a contructor function that takes a @param TypeName {String} and returns an instance', function(){
-                new Action('ACTION_TYPE').should.be.instanceof( Action );
-            });
-            it('=> on construction if @param TypeName is not a String then return NULL', function(){
-                Action.should.throw();
+            it('=> should be an instace of Rx.Observer', function(){
+                expect( new Watcher() ).to.be.instanceof( Rx.Observer );
             });
         });
-        describe('@property type: String', function() {
-            var actionName = 'Action_TYPE';
-            it('=> should be defined', function(){
-                new Action( actionName ).should.have.property('type');
+        describe('@constructor ({ ?onSignal: Function, ?onDone: Function, ?onError: Function }): Watcher', function(){
+            it( '=> should construct a Watcher if an initial object is passed an assign each argument accordingly', function(){
+                var onSignal = function(){};
+                var onDone = function(){};
+                var onError = function(){};
+                var watcher = new Watcher({
+                    onSignal: onSignal,
+                    onDone: onDone,
+                    onError: onError
+                });
+                expect( watcher.onSignal === onSignal ).to.be.true;
+                expect( watcher.onDone === onDone ).to.be.true;
+                expect( watcher.onError === onError ).to.be.true;
             });
-            it('=> should be of @type {String}', function(){
-                //console.log( new Action().type );
-                new Action( actionName ).type.should.be.a( 'string' );
-            });
-            it('=> the string should be composed of alphanumeric or underscores in uppercase, snakecase and trimmed', function(){
-                var wrongFormatName = ' _action $:@ type 1';
-                new Action ( wrongFormatName ).type.should.equal('ACTION_TYPE_1');
-            });
-            it('=> it should not be allowed to change', function(){
-                var actionName = 'ACTION_1';
-                var action = new Action( actionName );
-                action.type = '';
-                action.type.should.equal( actionName );
-            });
+            it( '=> should allow the construction of a Watcher instance even if certain arguments ommited', function(){
+                var onSignal = function(){};
+                var onDone = function(){};
+                var onError = function(){};
 
-        });
-        describe('@method getActionType(): String', function(){
-            it('=> should exist and be a function', function(){
-                new Action('ACTION').should.have.property('getActionType').which.is.instanceof( Function );
-            });
-            it('=> should @return {String} with which it was constructed', function(){
-                var actionName = 'ACTION_TEXT';
-                new Action(actionName).getActionType().should.equal( actionName );
-            });
-        });
+                var watcher1 = new Watcher({  onSignal: onSignal });
+                expect( watcher1.onSignal === onSignal ).to.be.true;
 
-        describe('@method toString(): String', function() {
-            it('=> should exist and be a function', function () {
-                new Action("ACTION_TYPE").toString().should.equal('Action { type: "ACTION_TYPE" }');
+                var watcher2 = new Watcher({  onDone: onDone });
+                expect( watcher2.onDone === onDone ).to.be.true;
+
+                var watcher3 = new Watcher({  onError: onError });
+                expect( watcher3.onError === onError ).to.be.true;
             });
         });
-        describe('@method asJSON(): String', function() {
-            it('=> should exist and be a function', function(){
-                new Action('ACTION').should.have.property('asJSON').which.is.instanceof( Function );
+        describe('@constructor ( ?onSignal: Function, ?onDone: Function, ?onError: Function ): Watcher', function(){
+            it( '=> should construct a Watcher if arguments are a spread of functions', function(){
+                var onSignal = function(){};
+                var onDone = function(){};
+                var onError = function(){};
+                var watcher = new Watcher( onSignal, onDone, onError );
+                expect( watcher.onSignal === onSignal ).to.be.true;
+                expect( watcher.onDone === onDone ).to.be.true;
+                expect( watcher.onError === onError ).to.be.true;
             });
-            it('=> should return a JSON stringified version of the Action', function () {
-                var expected = new Action("ACTION_TYPE").asJSON();
-                expected.should.be.equal('{"type":"ACTION_TYPE"}');
-            });
+        });
+        describe('@method addStream( stream: Stream ): Void', function(){
+
         });
     });
 });

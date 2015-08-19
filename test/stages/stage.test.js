@@ -414,7 +414,6 @@ describe('Stage =>', function(){
             });
             it('=> should return an array of actions which are registered in the stage only', function(){
                 var arrayOfActionsInStage;
-
                 arrayOfActionsInStage = stage.whichActorsExist( actor1, actor2, actor3, notAddedActor );
                 expect( arrayOfActionsInStage.length ).to.equal( 3 );
                 expect(_.includes( arrayOfActionsInStage, actor1, actor2, actor3 )).to.be.true;
@@ -441,6 +440,7 @@ describe('Stage =>', function(){
             var actors;
             var actions;
             var notAddedAction;
+            var stage;
             function getStageWithActorsAndActions (){
                 var stage = new Stage();
                 _.forEach(_.range(3), function( i ){
@@ -450,6 +450,7 @@ describe('Stage =>', function(){
                 return stage;
             };
             beforeEach(function(){
+                stage = new Stage();
                 receptor = new Receptor();
                 actorNames = {
                     _1: '1', _2: '2', _3: '3',
@@ -461,7 +462,7 @@ describe('Stage =>', function(){
                             .map(function( actorName, i ){
                                 return {
                                     key: '_' + ( i + 1 ),
-                                    value: Actors.createActor( actorName, receptor )
+                                    value: Actors.createActor( actorName, stage, [] )
                                 };
                             })
                             .indexBy('key')
@@ -480,7 +481,6 @@ describe('Stage =>', function(){
                 notAddedActor = Actors.EmptyActor;
             });
             it('=> should return an array empyt or not', function() {
-                var stage = new Stage();
                 var arrayFrom_noArgs = stage.whichActorsExistFromNames();
                 expect(_.isArray( arrayFrom_noArgs ) ).to.be.true;
             });
@@ -578,11 +578,10 @@ describe('Stage =>', function(){
             });
             it('=> should return true if the action of the signal is registered in on stage', function (){
                 var stage = new Stage();
-                var actor  = Actors.createActor('Tom_Hanks', new Receptor());
                 var action = Actions.createAction('Smile');
+                var actor  = Actors.createActor('Tom_Hanks', stage, [action]);
                 var signaller = stage.createSignaller( {} );
                 var signal = Signals.createSignal( signaller, action );
-                stage.addActorAction( actor, action );
                 expect( stage.isEmittable( signal ) ).to.be.true;
             });
             it('=> should return false if the action of the signal is not registered on stage', function (){

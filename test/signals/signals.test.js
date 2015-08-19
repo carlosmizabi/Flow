@@ -7,10 +7,6 @@ var Signals     = Flow.Signals;
 var Actions     = Flow.Actions;
 
 describe( 'Signals Module =>', function (){
-    describe( '@behaviour', function (){
-        it( '=> should provide a factory for safely creating signals' );
-        it( '=> should provide a empty signal object that is unique' );
-    });
 
     describe( '@unit', function (){
         describe( '@identity', function (){

@@ -9,12 +9,6 @@ var Stage   = Flow.Stages.Stage;
 
 describe( 'Signal =>', function(){
 
-    describe( '@behaviour', function(){
-        it( 'should encapsulate an action and message sent from a signaller' );
-        it( 'should always have an action and signaller' );
-        it( 'should allow the message to be optional' );
-    });
-
     describe( '@unit', function(){
         describe( '(Identity)', function(){
             it( '=> should be defined ', function(){

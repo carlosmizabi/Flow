@@ -5,10 +5,6 @@ var Actions = Flow.Actions;
 var Action  = Flow.Actions.Action;
 describe('Actions Module =>', function() {
 
-    describe('@behaviour', function(){
-        it('=> should provide a factory for creating actions safely');
-    });
-
     describe('@unit', function(){
         describe('@type', function(){
             it('is defined', function(){

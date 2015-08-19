@@ -3,7 +3,6 @@ var Flow = {
     Signals : require('./signals/signals'),
     Actions : require('./actions/actions'),
     Actors  : require('./actors/actors'),
-    Streams : require('./streams'),
     Watchers: require('./watchers/watchers'),
     Utils   : require('./utils/utils')
 };

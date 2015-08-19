@@ -3,11 +3,6 @@ var Flow    = require('../../src/flow.js');
 var Action  = Flow.Actions.Action;
 
 describe('Action =>', function(){
-
-    describe('@behaviour', function(){
-        it('should encapsulate an action type');
-    });
-
     describe('@unit', function(){
         describe('@type', function() {
             it('=> is defined', function () {

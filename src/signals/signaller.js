@@ -1,4 +1,5 @@
 var _       = require('../lib.imports').lodash;
+var Rx      = require('../lib.imports').Rx;
 
 var Signaller = function( owner, stage ){
     var Signaller = this;
@@ -11,7 +12,7 @@ var Signaller = function( owner, stage ){
         }
     }
     Signaller.finalize = function( stage ){
-        if( _.isObject(stage) && 'assignEmittersTo' in stage ){
+        if( stage instanceof Rx.Subject && 'assignEmittersTo' in stage ){
             Signaller.stage = stage;
             stage.assignEmittersTo( Signaller );
             if( 'emit' in Signaller && 'emitSignal' in Signaller ){
@@ -50,7 +51,7 @@ Signaller.prototype = _.create({
     }
 });
 
-Signaller.prototype.EmptySignaller =  new Signaller( {} );
+Signaller.prototype.EmptySignaller =  new Signaller( {}, new Rx.Subject() );
 Signaller.prototype.EmptySignaller.finalize = function(){};
 Object.freeze( Signaller.prototype );
 

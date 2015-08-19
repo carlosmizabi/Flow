@@ -5,10 +5,6 @@ var Rx          = require('../../src/lib.imports').Rx;
 
 describe( 'Watchers Module =>', function(){
 
-    describe('@behaviour', function(){
-        it('=> should provide a factory for creating watchers safely');
-    });
-
     describe('@unit', function(){
         describe('@type', function(){
             it('=> should should be defined', function(){
@@ -20,15 +16,6 @@ describe( 'Watchers Module =>', function(){
             it('=> should be defined', function(){
                 should.exist( Watchers.Watcher );
             });
-            it('=> should be an instance of Rx.AnonymousObserver', function(){
-                var watcher = new Watchers.Watcher({
-                    next: function(){},
-                });
-                expect( watcher ).to.be.instanceof( Rx.AnonymousObserver );
-            });
         });
-
     });
-
-
 });

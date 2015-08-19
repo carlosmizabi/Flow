@@ -35,9 +35,9 @@ var Signals = {
         }
     },
 
-    createSignaller: function( signallerOwner ){
+    createSignaller: function( signallerOwner, stage ){
         if(  _.isObject( signallerOwner )){
-            return new Signaller( signallerOwner );
+            return new Signaller( signallerOwner, stage );
         } else {
             return Signals.EmptySignaller;
         }
