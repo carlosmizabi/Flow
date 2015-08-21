@@ -1,5 +1,8 @@
 var _       = require('../lib.imports').lodash;
-var Rx      = require('../lib.imports').Rx;
+var Subject = require('../stages/subject');
+var Action  = require('../actions/action');
+var Signal  = require('./signal');
+var Message = require('./message');
 
 var Signaller = function( owner, stage ){
     var Signaller = this;
@@ -12,7 +15,7 @@ var Signaller = function( owner, stage ){
         }
     }
     Signaller.finalize = function( stage ){
-        if( stage instanceof Rx.Subject && 'assignEmittersTo' in stage ){
+        if( stage instanceof Subject && 'assignEmittersTo' in stage ){
             Signaller.stage = stage;
             stage.assignEmittersTo( Signaller );
             if( 'emit' in Signaller && 'emitSignal' in Signaller ){
@@ -23,13 +26,14 @@ var Signaller = function( owner, stage ){
     };
 
     Signaller.emitSignals =  function( spreadOfSignals ){
-        var signals = _.isArray( spreadOfSignals ) ? spreadOfSignals : arguments;
+        var signals = _.isArray( spreadOfSignals ) ? spreadOfSignals : _.toArray(arguments);
         if( Signaller.isFinalized() ){
             _.forEach( signals, function( signal ){
                 Signaller.emitSignal( signal );
             });
         }
     };
+
     _init();
 };
 
@@ -48,10 +52,22 @@ Signaller.prototype = _.create({
     },
     isEmptySignaller: function(){
         return this === this.EmptySignaller;
+    },
+    createSignal: function( action, message ){
+        var _action = Action.prototype.EmptyAction;
+        var _message = Signal.prototype.EmptyMessage;
+        if( action instanceof Action )
+            _action = action;
+        if( message instanceof Message )
+            _message = message;
+        else if ( _.isObject( message ) || _.isString( message ) ){
+            _message = new Message({ content: message })
+        }
+        return new Signal( this, _action, _message );
     }
 });
 
-Signaller.prototype.EmptySignaller =  new Signaller( {}, new Rx.Subject() );
+Signaller.prototype.EmptySignaller =  new Signaller( {}, new Subject() );
 Signaller.prototype.EmptySignaller.finalize = function(){};
 Object.freeze( Signaller.prototype );
 

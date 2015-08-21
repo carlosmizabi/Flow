@@ -1,13 +1,13 @@
 var Rx          = require('../lib.imports').Rx;
 var _           = require('../lib.imports').lodash;
 var Immutable   = require('../lib.imports' ).Immutable;
-var Receptor    = require('../watchers/receptor');
+var Subject     = require('../stages/subject');
 var Action      = require('../actions/action');
 
 var Actor, Private;
 
 Actor = function( name, stage, actions ){
-    Rx.Subject.call( this );
+    Subject.call( this );
     var Actor = this;
     var _private = {};
     var _arguments = arguments;
@@ -37,7 +37,7 @@ Actor = function( name, stage, actions ){
         Actor.name =  _.isString( name ) && name !== '' ? Private.buildActorName( name ) : Private.anonymousName;
     };
     _private.initStage = function(){
-        if( stage instanceof Rx.Subject && 'addActorAction' in stage ){
+        if( stage instanceof Subject && 'addActorAction' in stage ){
             Actor.stage = stage;
         } else {
             throw Actor.ERRORS.ACTOR_CANNOT_BE_INSTANTIATED_WITHOUT_A_VALID_STAGE;
@@ -77,7 +77,7 @@ Actor = function( name, stage, actions ){
     _private.init();
 };
 
-Actor.prototype = _.create( Rx.Subject.prototype, {
+Actor.prototype = _.create( Subject.prototype, {
     constructor: Actor,
     ACTOR_POSTFIX: '_ACTOR',
     ANOMYMOUS_ACTOR_NAME: 'ANONYMOUS' + '_ACTOR',
@@ -107,7 +107,7 @@ Private = {
         return nameString.toUpperCase().replace(/[\s*]/, '_') + Actor.prototype.ACTOR_POSTFIX;
     }
 };
-var emptySubject = new Rx.Subject();
+var emptySubject = new Subject();
 emptySubject.addActorAction = Rx.noop;
 Actor.prototype.EmptyActor = new Actor(
     'EMPTY',

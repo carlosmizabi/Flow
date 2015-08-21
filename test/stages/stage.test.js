@@ -4,7 +4,6 @@ var should      = chai.should();
 var expect      = chai.expect;
 // utils  ----------------------------------------------
 var _           = require('../../src/lib.imports').lodash;
-var Rx          = require('../../src/lib.imports').Rx;
 var Immutable   = require('../../src/lib.imports').Immutable;
 // Library ----------------------------------------------
 var Flow        = require('../../src/flow');
@@ -13,22 +12,18 @@ var Stage       = Flow.Stages.Stage;
 var Actors      = Flow.Actors;
 var Actions     = Flow.Actions;
 var Action      = Flow.Actions.Action;
-var Receptor    = Flow.Watchers.Receptor;
 var Signals     = Flow.Signals;
 var Signaller   = Flow.Signals.Signaller;
+var Subject     = Flow.Stages.Subject;
+var Watcher     = Flow.Watchers.Watcher;
 
 describe('Stage =>', function(){
-    describe('@behaviour', function(){
-        it('=> should offer means to dispatch signals into the stage stream');
-        it('=> should only have one stream through which all signals are published');
-        it('=> should have actors that filter the signals');
-    });
     describe('@unit', function(){
         describe('@type', function(){
-            it('=> should be an instance of Rx.Subject', function(){
+            it('=> should be an instance of Subject', function(){
                 var stage = new Stage();
                 stage.should.exist;
-                stage.should.be.instanceof( Rx.Subject );
+                stage.should.be.instanceof( Subject );
             });
         });
         describe('@method getActionRegistry(): ImmutableMap<Action, Actor>', function(){
@@ -59,7 +54,7 @@ describe('Stage =>', function(){
             });
             it('=> should allow the parameters to be inserted out of order', function(){
                 var stage = new Stage();
-                var actor = Actors.createActor('Tom_Hanks', new Receptor());
+                var actor = Actors.createActor('Tom_Hanks', stage);
                 var action = Actions.createAction('Smile');
                 var success = stage.addActorAction( action, actor );
                 stage.getActionRegistry().size.should.equal( 1 );
@@ -70,7 +65,7 @@ describe('Stage =>', function(){
         describe('@method getActionNamed( name: String ): Action', function(){
             it('=> should return an action from string name if on stage', function(){
                 var stage = new Stage();
-                var actor = Actors.createActor('Tom_Hanks', new Receptor());
+                var actor = Actors.createActor('Tom_Hanks', stage);
                 var action = Actions.createAction('Smile');
                 stage.addActorAction( action, actor );
                 expect( stage.getActionWithType( 'SHOULD_NOT_EXIST' ) === Actions.EmptyAction ).to.be.true;
@@ -118,7 +113,7 @@ describe('Stage =>', function(){
                 stage           = new Stage();
                 actorName       = 'Tom_Hanks';
                 actionName      = 'SMILE';
-                actor           = Actors.createActor( actorName , new Receptor() );
+                actor           = Actors.createActor( actorName , stage );
                 addedAction     = Actions.createAction( actionName );
                 notAddedAction  = Actions.createAction('Cry');
                 stage.addActorAction( actor, addedAction );
@@ -140,7 +135,7 @@ describe('Stage =>', function(){
         describe('@method hasAction( action: Action ): Boolean', function(){
             it('=> should take an action and return if the action is registered on the stage', function(){
                 var stage = new Stage();
-                var actor = Actors.createActor('Tom_Hanks', new Receptor());
+                var actor = Actors.createActor('Tom_Hanks', stage);
                 var smileAction = Actions.createAction('Smile');
                 var cryAction = Actions.createAction('Cry');
                 stage.addActorAction( actor, smileAction );
@@ -152,7 +147,7 @@ describe('Stage =>', function(){
         });
         describe('@method hasActionWithType( name: Action ): Boolean', function(){
             var stage = new Stage();
-            var actor = Actors.createActor('Tom_Hanks', new Receptor());
+            var actor = Actors.createActor('Tom_Hanks', stage);
             var smileAction = Actions.createAction('Smile');
             var cryAction = Actions.createAction('Cry');
             stage.addActorAction( actor, smileAction );
@@ -172,9 +167,9 @@ describe('Stage =>', function(){
         describe('@method hasActor( actor: Actor ): Boolean', function(){
             it('=> should take an actor and return true if the actor is registered on the stage', function(){
                 var stage = new Stage();
-                var actor1 = Actors.createActor('Tom_Hanks', new Receptor());
-                var actor2 = Actors.createActor('Angelina_Jolie', new Receptor());
-                var actor3 = Actors.createActor('Emily_Blunt', new Receptor());
+                var actor1 = Actors.createActor('Tom_Hanks', stage);
+                var actor2 = Actors.createActor('Angelina_Jolie', stage);
+                var actor3 = Actors.createActor('Emily_Blunt', stage);
                 var actor1Action = Actions.createAction('Smile');
                 var actor2Action = Actions.createAction('Kill');
                 var actor3Action = Actions.createAction('Dance');
@@ -187,7 +182,7 @@ describe('Stage =>', function(){
             });
             it('=> should take an actor and return false if the actor is not registered on the stage', function(){
                 var stage = new Stage();
-                var actorInStage = Actors.createActor('Tom_Hanks', new Receptor());
+                var actorInStage = Actors.createActor('Tom_Hanks', stage);
                 var smileAction = Actions.createAction('Smile');
                 var actorNotInStage = Actors.EmptyActor;
                 expect( stage.hasActor( actorNotInStage ) ).to.be.false;
@@ -208,9 +203,9 @@ describe('Stage =>', function(){
             });
             it('=> should take a string and return false if the actor is not registered on the stage',function(){
                 var stage = new Stage();
-                var actor1 = Actors.createActor('Tom_Hanks', new Receptor());
-                var actor2 = Actors.createActor('Angelina_Jolie', new Receptor());
-                var actor3 = Actors.createActor('Emily_Blunt', new Receptor());
+                var actor1 = Actors.createActor('Tom_Hanks', stage);
+                var actor2 = Actors.createActor('Angelina_Jolie', stage);
+                var actor3 = Actors.createActor('Emily_Blunt', stage);
                 var actor1Action = Actions.createAction('Smile');
                 var actor2Action = Actions.createAction('Kill');
                 stage.addActorAction( actor1, actor1Action );
@@ -229,9 +224,10 @@ describe('Stage =>', function(){
             var actor3Action;
             var notAddedAction;
             beforeEach(function(){
-                actor1  = Actors.createActor('Tom_Hanks', new Receptor());
-                actor2  = Actors.createActor('Angelina_Jolie', new Receptor());
-                actor3  = Actors.createActor('Emily_Blunt', new Receptor());
+                var stage = new Stage();
+                actor1  = Actors.createActor('Tom_Hanks', stage);
+                actor2  = Actors.createActor('Angelina_Jolie', stage);
+                actor3  = Actors.createActor('Emily_Blunt', stage);
                 actor1Action    = Actions.createAction('Smile');
                 actor2Action    = Actions.createAction('Kill');
                 actor3Action    = Actions.createAction('Dance');
@@ -434,7 +430,6 @@ describe('Stage =>', function(){
             });
         });
         describe('@method whichActorsExistFromNames( ...name: String ): Array<Actor>', function(){
-            var receptor;
             var actorNames;
             var actionTypes;
             var actors;
@@ -451,7 +446,6 @@ describe('Stage =>', function(){
             };
             beforeEach(function(){
                 stage = new Stage();
-                receptor = new Receptor();
                 actorNames = {
                     _1: '1', _2: '2', _3: '3',
                 };
@@ -618,7 +612,7 @@ describe('Stage =>', function(){
                     },
                     onComplete: function(){},
                     onError: function(){
-                        console.log('Rx.Subject instance error in test => should emit a message given a valid signal');
+                        console.log('Subject instance error in test => should emit a message given a valid signal');
                     }
                 };
             });
@@ -639,14 +633,6 @@ describe('Stage =>', function(){
                 stage.emit( Signals.EmptySignal );
                 expect( observer.signals.length ).to.equal( 0 );
             });
-        });
-
-        describe('@method addWatcher( watcher: Watcher ): Watcher', function(){
-            it('=> should add an observer to the stage stream');
-        });
-
-        describe('@method createWatcher( receptor: Receptor ): Watcher', function(){
-            it('=> should create and add an observer to the stage stream');
         });
     });
 });

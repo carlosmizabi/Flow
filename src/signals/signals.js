@@ -5,6 +5,8 @@ var Signal      = require( './signal' );
 var Signaller   = require( './signaller' );
 var Message     = require( './message' );
 
+var Signals, Private;
+
 var Signals = {
     Signal: Signal,
     EmptySignal: Signal.prototype.EmptySignal,
@@ -16,8 +18,15 @@ var Signals = {
     EmptyMessageHeader: {},
 
     createSignal: function( signaller, action, message ){
-        if( Signal.prototype.areValidConstructorParameters( signaller, action, message ) ){
-            return new Signal( signaller, action, message );
+        var _action, _message;
+        if( _.isObject( signaller )){
+            _action = Private.getValidAction( action );
+            _message = Private.getValidMessage( message );
+            if( _action.isEmptyAction() ){
+                return this.EmptySignal;
+            } else {
+                return new Signal( signaller, _action, _message );
+            }
         } else {
             return this.EmptySignal;
         }
@@ -36,7 +45,7 @@ var Signals = {
     },
 
     createSignaller: function( signallerOwner, stage ){
-        if(  _.isObject( signallerOwner )){
+        if( _.isObject( signallerOwner )){
             return new Signaller( signallerOwner, stage );
         } else {
             return Signals.EmptySignaller;
@@ -52,6 +61,26 @@ var Signals = {
     isEmptyMessageHeader: function( header ){
         return _.isPlainObject( header ) && header === Signals.EmptyMessageHeader;
     }
+};
+
+Private = {};
+
+Private.getValidAction = function( action ){
+    var _action = Action.prototype.EmptyAction;
+    if( action instanceof Action )
+        _action = action;
+    else if ( _.isString( action ))
+        _action = new Action(action);
+    return _action
+};
+
+Private.getValidMessage = function ( message ){
+    var _message = Signal.prototype.EmptyMessage;
+    if( message instanceof Message )
+        _message = message;
+    else if ( _.isObject( message ) || _.isString( message ) )
+        _message = new Message({ content: message })
+    return message;
 };
 
 Object.freeze( Signals );

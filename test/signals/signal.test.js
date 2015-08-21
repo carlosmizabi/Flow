@@ -44,7 +44,6 @@ describe( 'Signal =>', function(){
                     new Signal( signaller, action );
                 }).should.not.throw( ERROR );
             } );
-
         });
         describe( '@property signaller: Signaller', function(){
             it( '=> should exist and be an instanceof Signaller', function(){

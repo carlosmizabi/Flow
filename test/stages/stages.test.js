@@ -5,7 +5,6 @@ var expect      = chai.expect;
 var Flow        = require('../../src/flow.js');
 var Stages      = Flow.Stages;
 
-
 describe('Stages Module =>', function() {
     describe('@unit', function() {
         describe('@type Object', function () {
@@ -14,8 +13,23 @@ describe('Stages Module =>', function() {
             });
         });
         describe('@property Stage: Stage', function () {
-            it('=> should exist an constructor function', function () {
+            it('=> should exist and be a constructor function', function () {
                 Stages.should.have.property('Stage').which.is.a('function');
+            });
+        });
+        describe('@property Observer: Observer', function () {
+            it('=> should exist and be a constructor function', function () {
+                Stages.should.have.property('Observer').which.is.a('function');
+            });
+        });
+        describe('@property Observable: Observable', function () {
+            it('=> should exist and be a constructor function', function () {
+                Stages.should.have.property('Observable').which.is.a('function');
+            });
+        });
+        describe('@property Subject: Subject', function () {
+            it('=> should exist and be a constructor function', function () {
+                Stages.should.have.property('Observer').which.is.a('function');
             });
         });
         describe('@property EmptyStage: Stage', function () {

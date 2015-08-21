@@ -1,17 +1,17 @@
 var Immutable   = require('../lib.imports').Immutable;
 var Map         = Immutable.Map;
 var _           = require('../lib.imports').lodash;
-var Rx          = require('../lib.imports').Rx;
+var Subject     = require('./subject');
 var Actions     = require('../actions/actions');
 var Action      = require('../actions/action');
 var Actors      = require('../actors/actors');
 var Actor       = require('../actors/actor');
 var Utils       = require('../utils/utils');
-var Signals      = require('../signals/signals');
+var Signals     = require('../signals/signals');
 var Private     = {};
 
 var Stage = function(){
-    Rx.Subject.call( this );
+    Subject.call( this );
     var Stage = this;
     var _private = {};
 
@@ -141,7 +141,7 @@ var Stage = function(){
     Object.freeze( this );
 };
 
-Stage.prototype = _.create( Rx.Subject.prototype, {
+Stage.prototype = _.create( Subject.prototype, {
     constructor: Stage,
     createSignaller: function ( signallerOwner ){
         var signaller = Signals.EmptySignaller;
@@ -162,13 +162,14 @@ Private.createInTheSignallerAn_Emit_Function = function ( Stage, signaller ){
 };
 
 Private.createEmitFunction = function( Stage, signaller ){
-    return function( action, message ){
+    var emit = function( action, message ){
         var signal = Signals.createSignal( signaller, action, message );
         if( signal.isEmptySignal() === false ){
             Stage.emit( signal );
         }
         return signal;
-    }
+    };
+    return emit;
 };
 
 Private.createInTheSignallerAn_EmitSignal_Function = function ( Stage, signaller ){
@@ -178,12 +179,13 @@ Private.createInTheSignallerAn_EmitSignal_Function = function ( Stage, signaller
 };
 
 Private.createEmitSignalFunction= function( Stage, signaller ){
-    return function( signal ){
+    var emitSignal = function( signal ){
         if( signal instanceof Signals.Signal && signal.signaller === signaller ){
             if( signal.isEmptySignal() === false )
                 Stage.emit( signal );
         }
     }
+    return emitSignal;
 };
 
 Private.isValidActionRegistryEntry = function ( action, actor ){

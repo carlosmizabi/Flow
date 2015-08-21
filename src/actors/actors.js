@@ -1,7 +1,6 @@
 var _           = require('../lib.imports').lodash;
 var Rx          = require('../lib.imports').Rx;
 var Actor       = require('./actor');
-var Receptor    = require('../watchers/receptor');
 
 var Actors = {
     Actor: Actor,

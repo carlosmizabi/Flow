@@ -7,7 +7,7 @@ describe( 'Watchers Module =>', function(){
 
     describe('@unit', function(){
         describe('@type', function(){
-            it('=> should should be defined', function(){
+            it('=> should be defined', function(){
                 should.exist( Watchers );
             });
         });

@@ -7,6 +7,7 @@ var Stage = Stages.Stage;
 var Actors = Flow.Actors;
 var Actions = Flow.Actions;
 var Signals = Flow.Signals;
+var Signal  = Flow.Signals.Signal;
 
 describe( 'Signaller =>', function(){
 
@@ -262,6 +263,19 @@ describe( 'Signaller =>', function(){
             it( '=> should return false if the stage is not a valid stage or the signaller has yet no been finalized', function(){
                 var signaller = new Signaller( stage, owner );
                 expect( signaller.isStageALive() ).to.be.false;
+            });
+            it( '=> should return true if the stage is still a valid stage', function(){
+                var signaller = new Signaller( owner );
+                signaller.finalize( stage );
+                expect( signaller.isStageALive() ).to.be.true;
+            });
+        });
+        describe( '@method createSignal(): Signal', function(){
+            it( '=> should return a new Signal', function(){
+                var signaller = new Signaller( owner, stage );
+                var action = Actions.createAction('DO_SOMETHING');
+                var signal = signaller.createSignal( action );
+                expect( signal ).to.be.instanceof( Signal );
             });
             it( '=> should return true if the stage is still a valid stage', function(){
                 var signaller = new Signaller( owner );

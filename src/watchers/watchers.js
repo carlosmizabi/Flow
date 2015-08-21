@@ -1,10 +1,7 @@
-var Rx          = require('../lib.imports').Rx;
-var Receptor    = require('./receptor');
 var Watcher     = require('./watcher');
 
 var Watchers = {
-    Watcher: Watcher,
-    Receptor: Receptor
+    Watcher: Watcher
 };
 
 Object.freeze( Watchers );

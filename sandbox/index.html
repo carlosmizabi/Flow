@@ -10,6 +10,8 @@
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.0/lodash.js" type="text/javascript"></script>-->
     <script type="text/javascript">
 
+        console.log( new Rx.Observer() );
+
         var subject = new Rx.Subject();
         var subject2 = new Rx.Subject(
                 function(x){
@@ -33,7 +35,8 @@
                     console.log('watcher onError', error );
                 }
         );
-        subject.multicast( subject2 );
+        console.log('WATCHER: ', watcher );
+//        subject.multicast( subject2 );
 //       subject.multicast( subject2, function( e ){
 //            console.log('ever');
 //            return e instanceof Date;

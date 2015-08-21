@@ -1,15 +1,14 @@
 var should      = require('chai').should();
 var expect      = require('chai').expect;
 var _           = require('../../src/lib.imports').lodash;
-var Rx          = require('../../src/lib.imports').Rx;
 var Immutable   = require('../../src/lib.imports').Immutable;
 var Flow        = require('../../src/flow');
 var Stages      = Flow.Stages;
 var Signals     = Flow.Signals;
+var Subject     = Flow.Stages.Subject;
 var Actors      = Flow.Actors;
 var Actor       = Actors.Actor;
 var Actions     = Flow.Actions;
-var Receptor    = Flow.Watchers.Receptor;
 
 describe('Actor =>', function(){
     describe('@behaviour', function(){
@@ -65,9 +64,9 @@ describe('Actor =>', function(){
             it('=> is a function', function () {
                 Actor.should.be.instanceof(Function);
             });
-            it('@extends Rx.Subject ', function () {
+            it('@extends Subject ', function () {
                 var actor = new Actor('ACTOR', Stages.createStage(), []);
-                actor.should.be.instanceof(Rx.Subject);
+                actor.should.be.instanceof(Subject);
             });
         });
         describe('@constructor( name: String, stage: Stage, actions: Immutable.Set<Action> ): Void', function () {
@@ -104,7 +103,7 @@ describe('Actor =>', function(){
             it( '=> should exist and be of Type of Stage', function(){
                 var actor = new Actor( 'My Actor', Stages.createStage(), []);
                 expect( actor.stage ).to.be.defined;
-                expect( actor.stage ).to.be.instanceof( Rx.Subject );
+                expect( actor.stage ).to.be.instanceof( Subject );
             });
         });
         describe( '@property actions: Actions', function(){

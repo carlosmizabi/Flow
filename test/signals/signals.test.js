@@ -43,15 +43,19 @@ describe( 'Signals Module =>', function (){
             });
         });
         describe('@method createSignal(signaller: Object, action: Action, ?message: Object)', function (){
-            it('=> should return the an empty signal if there is no action and a signaller ', function (){
+            it('=> should return the empty signal if there is no action and a signaller ', function (){
                 Signals.createSignal().should.equal( Signals.EmptySignal );
                 Signals.createSignal( null, null ).should.equal( Signals.EmptySignal );
                 Signals.createSignal( {}, null ).should.equal( Signals.EmptySignal );
                 Signals.createSignal( null, Actions.EmptyAction ).should.equal( Signals.EmptySignal );
             });
+            it('=> should return the empty signal if an action is not valid', function (){
+                var signaller = new Signals.Signaller( this, Stages.createStage() );
+                Signals.createSignal( signaller, Actions.EmptyAction ).should.equal( Signals.EmptySignal );
+            });
             it('=> should return a signal that is not empty if an action and signaller are provided', function (){
-                var signaller = new Signals.Signaller( Stages.createStage(), this);
-                Signals.createSignal( signaller, Actions.EmptyAction ).should.not.equal( Signals.EmptySignal );
+                var signaller = new Signals.Signaller( this, Stages.createStage() );
+                Signals.createSignal( signaller, "NEW_ACTION_TYPE" ).should.not.equal( Signals.EmptySignal );
             });
         });
         describe('@method createSignaller(  owner: Object ): Signaller', function (){

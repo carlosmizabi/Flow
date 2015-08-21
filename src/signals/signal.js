@@ -2,7 +2,6 @@ var _           = require('../lib.imports').lodash;
 var Actions     = require('../actions/actions');
 var Action      = require('../actions/action');
 var Message     = require('./message');
-var Signaller   = require('./signaller');
 
 var Signal = function ( signaller, action, message ){
     if( this.areValidConstructorParameters( signaller, action, message ) ) {
@@ -18,7 +17,7 @@ var Signal = function ( signaller, action, message ){
 Signal.prototype = _.create({
     constructor: Signal,
     areValidConstructorParameters: function ( signaller, action){
-        if( signaller instanceof Signaller && action instanceof Action )
+        if( _.isObject( signaller ) && action instanceof Action )
             return true;
         else
             return false;
@@ -44,7 +43,7 @@ Signal.prototype = _.create({
     }
 });
 
-Signal.prototype.EmptySignal = new Signal( Signaller.prototype.EmptySignaller, Actions.EmptyAction );
+Signal.prototype.EmptySignal = new Signal( {}, Actions.EmptyAction );
 
 Object.freeze(Signal);
 Object.freeze(Signal.prototype);

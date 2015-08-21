@@ -3,7 +3,6 @@ var expect      = require('chai').expect;
 var Flow        = require('../../src/flow.js');
 var Stages      = Flow.Stages;
 var Actors      = Flow.Actors;
-var Receptor    = Flow.Watchers.Receptor;
 
 describe('Actors Module =>', function () {
 
