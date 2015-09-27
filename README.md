@@ -3,9 +3,10 @@ A react flux inspired library as a thin layer on top of Rx to facilitate the con
 
 Based on the ideas of React Flux with uni directional messaging flowing. 
 
-**Flow**, provides a **Stage** in which **Actions** are registered with an **Actor**.
+####Stages
 
-###########################
+**Flow**, provides a **Stage** in which system entities can dispatch **Signals** that other sytem entities can listen for. In essence it is a communication system that allow decoupling of system entities from one another. These allows modules to be easily added or removed from the system without necessary breaking the whole system. By providing a few primitive components (i.e., actions, signals, signallers, actors, messsages, watchers), that reinforce a simple but "solid" structure, the system can "shape-shift" more easily. A system can be easly subdivided into further stages. For example, a stage for the View layer, a stage for the data layer, and a stage for whole application. However, this should not be a dogma for inter-components comunication. If a system entity is better suited to be direclty connected/coupled with another entity then so be it. Having said that, **Flow** offers the unidirectional event flow as proposed by react's flux with the added feature of enabling decoupling of components. New components can be added to take advantage of the current system easily and current ones can also be replaced easily. A possible analogy would be a mail delivery system but a better analogy is something like twitter where users tweet "signals" on to twitter which are filtered to their "tweeting channel", other users can then subscribe to those tweets and react to those. 
+
 
 ####Actions
 
