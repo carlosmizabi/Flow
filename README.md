@@ -28,7 +28,7 @@ A **Signal** wrapps an **Action**, a **Message** and a reference to the **Signal
 
 A **Message** has a body and a header, which can be of any type. They are the containers to pass data, or reference arround.
 
-####Watcher
+####Watchers
 
 These are fancy Observers in that they can subscribe to observsers/subject like Actor and allow managing of these subscriptions.
 
